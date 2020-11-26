@@ -26,7 +26,7 @@ services:
             context: .
         container_name: conteiner_cunsumer
         command: python3 /project/consumer/consumer.py
-        restart: "no"
+        restart: "always"
         networks:
             - waiting_for_conteiner
         depends_on:
