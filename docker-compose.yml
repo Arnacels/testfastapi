@@ -1,6 +1,7 @@
-version: '3'
+version: '3.4'
 networks:
-    waiting_for_conteiner:
+  app-tier:
+    driver: bridge
 services:
     newrabbitmq:
         hostname: rabbitmq
@@ -8,13 +9,18 @@ services:
         environment:
             - RABBITMQ_DEFAULT_USER=guest
             - RABBITMQ_DEFAULT_PASS=guest
+        networks:
+            - app-tier
         ports:
             - "5672:5672"
+            - "15672:15672"
     web:
         build:
             dockerfile: rest.Dockerfile
             context: .
-        command: uvicorn main:app --reload
+        command: uvicorn main:app --host 0.0.0.0 --port 8000
+        networks:
+            - app-tier
         ports:
             - "8000:8000"
         depends_on:
@@ -28,6 +34,6 @@ services:
         command: python3 /project/consumer/consumer.py
         restart: "always"
         networks:
-            - waiting_for_conteiner
+            - app-tier
         depends_on:
             - web
