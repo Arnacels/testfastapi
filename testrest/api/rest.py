@@ -1,25 +1,20 @@
-from typing import Optional, Dict
 from fastapi import APIRouter
 import pika
-from pydantic import BaseModel
+
+from api.models import Task
+from config import RABBITMQ_HOST, RABBITMQ_PORT
 
 router = APIRouter()
-
-
-class Task(BaseModel):
-    task_id: str
-    title: str
-    params: Optional[Dict] = None
 
 
 @router.post("/add/")
 async def endpoint(task: Task):
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
+        pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT))
     new_task = task.__dict__
     params = ""
     for param in new_task.get("params"):
-        params += param + " " + new_task.get("params").get(param)+" "
+        params += param + " " + new_task.get("params").get(param) + " "
     body = f'task - {new_task.get("task_id")} title - {new_task.get("title")} params - {params}'
     channel = connection.channel()
     channel.queue_declare(queue='task')

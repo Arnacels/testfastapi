@@ -1,8 +1,11 @@
 import pika
 
+from config import RABBITMQ_HOST, RABBITMQ_PORT
+
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost', port=5672))
+    print("start work")
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT))
     channel = connection.channel()
 
     channel.queue_declare(queue='task')
@@ -16,3 +19,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print("end work")
